@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. vmconfig.sh
+
+for i in `ls $EXAM_PATH`
+do
+    echo "vmrun start $EXAM_PATH/$i nogui"
+    eval "vmrun start $EXAM_PATH/$i nogui"
+done

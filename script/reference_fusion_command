@@ -1,0 +1,1 @@
+vmware-cmd -s register /path/to/new/file.vmx

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/usr/bin/sudo /Applications/VMware Fusion.app/Contents/Library/vmnet-cli --stop
+/usr/bin/sudo /Applications/VMware Fusion.app/Contents/Library/vmnet-cli --start

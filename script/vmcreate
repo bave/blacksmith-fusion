@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+. vmconfig.sh
+
+NODE_NUM=$1
+
+if [ -z $NODE_NUM ]; then
+    echo "please input <create node number> in arg1"
+    exit 1
+fi
+
+for i in $(seq 1 $NODE_NUM)
+do
+    echo "ovf2node node$i $i"
+    eval "ovf2node node$i $i"
+done
+

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. vmconfig.sh
+
+for i in `ls $EXAM_PATH`
+do
+    echo "rm -rf $EXAM_PATH/$i"
+    eval "rm -rf $EXAM_PATH/$i"
+done

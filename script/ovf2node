@@ -1,0 +1,58 @@
+#!/bin/sh
+
+. vmconfig.sh
+
+NODE_NAME=$1
+NODE_NUM=$2
+
+if [ -z $NODE_NAME ]; then
+    echo "please input <node_name> in arg1"
+    exit 1
+fi
+
+if [ -z $NODE_NUM ]; then
+    echo "please input NODE_NUM in arg2"
+    exit 1
+fi
+
+echo "rm -rf $EXAM_PATH/$NODE_NAME.vmwarevm"
+eval "rm -rf $EXAM_PATH/$NODE_NAME.vmwarevm"
+eval "$OVFTOOL_PATH $OVF_PATH/ovf_node/node.ovf $VMX_PATH $EXAM_PATH/$NODE_NAME/$NODE_NAME.vmx"
+
+VMX_PATH=$EXAM_PATH/$NODE_NAME.vmwarevm/$NODE_NAME.vmx
+
+echo 'ethernet0.vnet = "vmnet10"' >> $VMX_PATH
+echo 'ethernet1.vnet = "vmnet11"' >> $VMX_PATH
+
+# FYI (for your information)
+#uuid.location、uuid.bios、ethernet0.generatedAddressの設定値を確認し、
+#下位24ビットが元のMACアドレスの下位24ビットと同一になるように書き換えます。
+#echo 'uuid.location = "56 4d cd 5b 41 c2 b4 31-bc 5d b4 08 53 aa bb cc"'
+#echo 'uuid.bios = "56 4d cd 5b 41 c2 b4 31-bc 5d b4 08 53 aa bb cc"'
+#echo 'ethernet0.generatedAddress = "00:0C:29:aa:bb:cc"'
+#(上記例だと「aa bb cc」部分)
+
+ETH0_MACADDR="$BASE_OUI:`mkmac $NODE_NUM`"
+ETH1_NUM=`expr $NODE_NUM + 65536`
+ETH1_MACADDR="$BASE_OUI:`mkmac $ETH1_NUM`"
+echo "ethernet0.Address = \"$ETH0_MACADDR\"" >> $VMX_PATH
+echo "ethernet1.Address = \"$ETH1_MACADDR\"" >> $VMX_PATH
+
+#echo "ethernet0.generatedAddress = $ETH0_MACADDR" >> $VMX_PATH
+#echo "ethernet0.generatedAddressOffset = 0"       >> $VMX_PATH
+#echo "ethernet1.generatedAddress = $ETH1_MACADDR" >> $VMX_PATH
+#echo "ethernet1.generatedAddressOffset = 0"       >> $VMX_PATH
+#echo "uuid.location = \"56 4d cd 5b 41 c2 b4 31-bc 5d b4 08 53 `mkid $NODE_NUM`\"" >> $VMX_PATH
+#echo "uuid.bios = \"56 4d cd 5b 41 c2 b4 31-bc 5d b4 08 53 `mkid $NODE_NUM`\""     >> $VMX_PATH
+
+echo 'uuid.action = "keep"'                       >> $VMX_PATH
+
+VNC_PORT_NUM=`expr $NODE_NUM + $VNC_BASE_NUM`
+echo "RemoteDisplay.vnc.port = \"$VNC_PORT_NUM\"" >> $VMX_PATH
+echo "RemoteDisplay.vnc.enabled = \"TRUE\""       >> $VMX_PATH
+echo "RemoteDisplay.vnc.keymap = \"en\""          >> $VMX_PATH
+echo "RemoteDisplay.vnc.password = \"hogehoge\""  >> $VMX_PATH
+echo "annotation = \"VNC PORT: $VNC_PORT_NUM\""   >> $VMX_PATH
+
+sed -i -e "s/bridged/custom/g" $VMX_PATH
+sed -i -e "s/generated/static/g" $VMX_PATH

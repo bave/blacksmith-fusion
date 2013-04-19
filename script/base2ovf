@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. vmconfig.sh
+
+BASENODE_PATH=$BASE_PATH/node.vmwarevm/node.vmx
+
+rm -rf $OVF_PATH/ovf_node
+#s/Applications/VMware\ Fusion.app/Contents/Library/VMware\ OVF\ Tool/ovftool ~/vmware/node.vmwarevm/node.vmx ~/vmware/ovf_node/node.ovf
+echo "$OVFTOOL_PATH --compress=9 $BASENODE_PATH $OVF_PATH/ovf_node/node.ovf"
+eval "$OVFTOOL_PATH --compress=9 $BASENODE_PATH $OVF_PATH/ovf_node/node.ovf"

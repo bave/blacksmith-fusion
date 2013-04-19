@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. vmconfig.sh
+
+IFS='
+'
+
+for i in `vmlist | grep -v "Total running" | awk "/$EXAM_DIR/{print $1}"`
+do
+    j=`echo $i | sed -e 's/ /\\\ /g'`
+    echo "vmrun stop $j"
+    eval "vmrun stop $j"
+done
